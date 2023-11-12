@@ -13,6 +13,7 @@ class ProgressMonitor(threading.Thread):
     - update_interval: The time interval between updates.
     - should_terminate: Event to signal termination of the thread.
     """
+
     def __init__(self, stdscr, senders, update_interval, stop_event):
         super(ProgressMonitor, self).__init__()
         self.stdscr = stdscr
@@ -32,17 +33,25 @@ class ProgressMonitor(threading.Thread):
 
                 total_sent = sum(sender.messages_sent for sender in self.senders)
                 total_failed = sum(sender.messages_failed for sender in self.senders)
-                average_time_per_message = sum(sender.total_processing_time for sender in self.senders) / total_sent if total_sent > 0 else 0
+                average_time_per_message = sum(
+                    sender.total_processing_time for sender in self.senders) / total_sent if total_sent > 0 else 0
 
                 all_senders_completed = not any(sender.is_alive() for sender in self.senders)
-                self.stdscr.clear()
-                self.stdscr.addstr(0, 0, f"Elapsed Time: {elapsed_time:.2f}s")
-                self.stdscr.addstr(1, 0, f"Messages Sent: {total_sent}")
-                self.stdscr.addstr(2, 0, f"Messages Failed: {total_failed}")
-                self.stdscr.addstr(3, 0, f"Average Time per Message: {average_time_per_message:.2f}s")
-                self.stdscr.refresh()
+                if self.stdscr:
+                    self.stdscr.clear()
+                    self.stdscr.addstr(0, 0, f"Elapsed Time: {elapsed_time:.2f}s")
+                    self.stdscr.addstr(1, 0, f"Messages Sent: {total_sent}")
+                    self.stdscr.addstr(2, 0, f"Messages Failed: {total_failed}")
+                    self.stdscr.addstr(3, 0, f"Average Time per Message: {average_time_per_message:.2f}s")
+                    self.stdscr.refresh()
+                else:
+                    logging.info(f"Elapsed Time: {elapsed_time:.2f}s")
+                    logging.info(f"Messages Sent: {total_sent}")
+                    logging.info(f"Messages Failed: {total_failed}")
+                    logging.info(f"Average Time per Message: {average_time_per_message:.2f}s")
 
-                logging.debug(f"Progress update. Elapsed Time: {elapsed_time:.2f}s | Messages Sent: {total_sent} | Messages Failed: {total_failed} | Average Time per Message: {average_time_per_message:.2f}s")
+                logging.debug(
+                    f"Progress update. Elapsed Time: {elapsed_time:.2f}s | Messages Sent: {total_sent} | Messages Failed: {total_failed} | Average Time per Message: {average_time_per_message:.2f}s")
 
                 # Check if the termination event is set
                 if self.should_terminate.is_set():

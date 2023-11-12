@@ -28,9 +28,9 @@ import os
 import signal
 import time
 from datetime import datetime
-from src.producer import MessageProducer
-from src.sender import MessageSender
-from src.progressmonitor import ProgressMonitor
+from sms_alert_forge.producer import MessageProducer
+from sms_alert_forge.sender import MessageSender
+from sms_alert_forge.progressmonitor import ProgressMonitor
 
 log_dir = 'logs'
 os.makedirs(log_dir, exist_ok=True)
@@ -151,13 +151,11 @@ def main(stdscr, config, output_callback=None):
         output_callback (callable): Callback function for displaying messages.
     """
     try:
-        # Initialize curses
-        curses.curs_set(0)
-        stdscr.clear()
-
-        # Display fancy text
-        display_fancy_text(stdscr)
-        time.sleep(2)  # Sleep for 2 seconds to show the fancy text before starting the simulation
+        if stdscr:
+            stdscr.clear()
+            # Display fancy text
+            display_fancy_text(stdscr)
+            time.sleep(2)  # Sleep for 2 seconds to show the fancy text before starting the simulation
 
         logging.info("Main started.")
 
@@ -205,19 +203,19 @@ def main(stdscr, config, output_callback=None):
         progress_monitor.join()
         progress_monitor.stop()
 
-#todo
-        # Display a message and wait for user input before exiting
-        #stdscr.addstr(stdscr.getmaxyx()[0] - 1, 0, "Press 'q' to exit.")
-        #stdscr.refresh()
+        if stdscr:
+            # Display a message and wait for user input before exiting
+            stdscr.addstr(stdscr.getmaxyx()[0] - 1, 0, "Press 'q' to exit.")
+            stdscr.refresh()
 
-        # Display a message and wait for user input before exiting
-        if output_callback:
-            output_callback("Press 'q' to exit.")
+            # Display a message and wait for user input before exiting
+            #if output_callback:
+            #    output_callback("Press 'q' to exit.")
 
-        while True:
-            key = stdscr.getch()
-            if key == ord('q'):
-                break
+            while True:
+                key = stdscr.getch()
+                if key == ord('q'):
+                    break
 
         logging.info("Main completed.")
 
