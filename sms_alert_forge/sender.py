@@ -57,11 +57,3 @@ class MessageSender(threading.Thread):
         except Exception as e:
             logging.error(f"Error in MessageSender: {e}", exc_info=True)
 
-    def is_done(self):
-        """
-        Check if the MessageSender has processed all messages.
-
-        Returns:
-        - True if all messages are processed, False otherwise.
-        """
-        return self.message_queue.empty() and not self.is_alive()

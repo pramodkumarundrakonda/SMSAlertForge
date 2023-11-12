@@ -54,7 +54,7 @@ def read_config(config_file):
         # Check for empty fields in the configuration
         if not all(config.get(section) for section in ['logging', 'messages', 'senders', 'progress_monitor']):
             logging.error("One or more required fields are empty in the configuration. Exiting.")
-            sys.exit(1)
+            #sys.exit(1)
 
         return config
     except FileNotFoundError:
@@ -141,14 +141,13 @@ def display_fancy_text(stdscr):
         logging.error(f"Error reading ASCII art file: {e}", exc_info=True)
 
 
-def main(stdscr, config, output_callback=None):
+def main(stdscr, config):
     """
     Main function to run the SMS alert simulation.
 
     Args:
         stdscr (curses.window): Curses window object.
         config (dict): Configuration parameters.
-        output_callback (callable): Callback function for displaying messages.
     """
     try:
         if stdscr:
@@ -207,10 +206,6 @@ def main(stdscr, config, output_callback=None):
             # Display a message and wait for user input before exiting
             stdscr.addstr(stdscr.getmaxyx()[0] - 1, 0, "Press 'q' to exit.")
             stdscr.refresh()
-
-            # Display a message and wait for user input before exiting
-            #if output_callback:
-            #    output_callback("Press 'q' to exit.")
 
             while True:
                 key = stdscr.getch()

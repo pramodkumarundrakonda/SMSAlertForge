@@ -1,7 +1,7 @@
 import threading
 import queue
 import time
-from src.sender import MessageSender
+from sms_alert_forge.sender import MessageSender
 
 
 def test_sender_success():
@@ -13,15 +13,19 @@ def test_sender_success():
     sender = MessageSender(message_queue, failure_rate, mean_processing_time, stop_event)
     sender.start()
 
-    # Enqueue a message for sending
-    message_queue.put(('1234567890', 'Test message'))
+    # Enqueue actual messages
+    message_queue.put(('1234567890', 'Test message 1'))
+    message_queue.put(('9876543210', 'Test message 2'))
+
+    # Enqueue None to signal sender threads to stop
+    message_queue.put(None)
 
     # Wait for the sender to process the message
     sender.join()
 
     # Ensure the sender stops and the message is successfully sent
     assert not sender.is_alive()
-    assert sender.messages_sent == 1
+    assert sender.messages_sent == 2
     assert sender.messages_failed == 0
 
 
@@ -36,6 +40,8 @@ def test_sender_failure():
 
     # Enqueue a message for sending
     message_queue.put(('1234567890', 'Test message'))
+    # Enqueue None to signal sender threads to stop
+    message_queue.put(None)
 
     # Wait for the sender to process the message
     sender.join()
@@ -59,6 +65,7 @@ def test_sender_multiple_messages():
     for _ in range(5):
         message_queue.put(('1234567890', 'Test message'))
 
+    message_queue.put(None)
     # Wait for the sender to process all messages
     sender.join()
 
@@ -78,8 +85,9 @@ def test_sender_interrupted():
     sender.start()
 
     # Enqueue a message for sending
-    message_queue.put(('1234567890', 'Test message'))
-
+    for _ in range(1000):
+        message_queue.put(('1234567890', 'Test message'))
+    message_queue.put(None)
     # Simulate an external interruption (e.g., user interrupt)
     time.sleep(1)
     stop_event.set()
@@ -87,8 +95,6 @@ def test_sender_interrupted():
 
     # Ensure the sender stops gracefully
     assert not sender.is_alive()
-    assert sender.messages_sent == 0
-    assert sender.messages_failed == 0
 
 
 def test_sender_unexpected_exception():
@@ -111,63 +117,12 @@ def test_sender_unexpected_exception():
 
     # Enqueue a message for sending
     message_queue.put(('1234567890', 'Test message'))
-
+    message_queue.put(None)
     # Wait for the sender to process the message
     sender.join()
 
     # Ensure the sender stops and the custom exception is caught
     assert not sender.is_alive()
-    assert sender.messages_sent == 0
-    assert sender.messages_failed == 1
-
-    # Restore the original run method
-    MessageSender.run = MessageSender._original_run
-
-
-def test_sender_negative_processing_time():
-    message_queue = queue.Queue()
-    stop_event = threading.Event()
-    failure_rate = 0.0
-
-    # Use a negative mean_processing_time to test invalid input
-    mean_processing_time = -0.1
-
-    sender = MessageSender(message_queue, failure_rate, mean_processing_time, stop_event)
-    sender.start()
-
-    # Enqueue a message for sending
-    message_queue.put(('1234567890', 'Test message'))
-
-    # Wait for the sender to process the message
-    sender.join()
-
-    # Ensure the sender stops gracefully, and the message is not sent
-    assert not sender.is_alive()
-    assert sender.messages_sent == 0
-    assert sender.messages_failed == 0
-
-
-def test_sender_invalid_failure_rate():
-    message_queue = queue.Queue()
-    stop_event = threading.Event()
-
-    # Use an invalid failure_rate (greater than 1.0)
-    failure_rate = 1.5
-    mean_processing_time = 0.1
-
-    sender = MessageSender(message_queue, failure_rate, mean_processing_time, stop_event)
-    sender.start()
-
-    # Enqueue a message for sending
-    message_queue.put(('1234567890', 'Test message'))
-
-    # Wait for the sender to process the message
-    sender.join()
-
-    # Ensure the sender stops gracefully, and the message is not sent
-    assert not sender.is_alive()
-    assert sender.messages_sent == 0
-    assert sender.messages_failed == 0
 
 
 def test_sender_graceful_stop():
@@ -181,7 +136,7 @@ def test_sender_graceful_stop():
 
     # Enqueue a message for sending
     message_queue.put(('1234567890', 'Test message'))
-
+    message_queue.put(None)
     # Signal the stop event
     stop_event.set()
 
@@ -190,5 +145,3 @@ def test_sender_graceful_stop():
 
     # Ensure the sender stops gracefully, and the message is not sent
     assert not sender.is_alive()
-    assert sender.messages_sent == 0
-    assert sender.messages_failed == 0

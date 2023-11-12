@@ -4,10 +4,10 @@ import threading
 import queue
 import time
 from unittest.mock import patch
-from src.__main__ import read_config, setup_logging, signal_handler, display_fancy_text, main
-from src.producer import MessageProducer
-from src.sender import MessageSender
-from src.progressmonitor import ProgressMonitor
+from sms_alert_forge.__main__ import read_config, setup_logging, signal_handler, display_fancy_text, main
+from sms_alert_forge.producer import MessageProducer
+from sms_alert_forge.sender import MessageSender
+from sms_alert_forge.progressmonitor import ProgressMonitor
 
 # Use a temporary directory for logs
 log_dir = 'tmp_logs'

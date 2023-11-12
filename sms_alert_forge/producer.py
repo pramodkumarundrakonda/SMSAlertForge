@@ -32,7 +32,7 @@ class MessageProducer(threading.Thread):
                 message = ''.join(random.choices('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=100))
                 phone_number = random.randint(1000000000, 9999999999)
                 self.message_queue.put((phone_number, message))
-                time.sleep(0.1)
+                time.sleep(0.01)
                 logging.debug(f"Produced message: {message} for {phone_number}")
 
             logging.info("MessageProducer completed.")

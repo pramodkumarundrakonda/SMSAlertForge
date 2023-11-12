@@ -1,8 +1,10 @@
 import threading
 import queue
 import time
-from src.progressmonitor import ProgressMonitor
-from src.sender import MessageSender
+
+from sms_alert_forge.producer import MessageProducer
+from sms_alert_forge.progressmonitor import ProgressMonitor
+from sms_alert_forge.sender import MessageSender
 
 
 def test_progress_monitor_success():
@@ -164,3 +166,66 @@ def test_progress_monitor_sender_exception():
 
     # Ensure the progress monitor stops gracefully
     assert not progress_monitor.is_alive()
+
+
+def test_progress_monitor_successful_update(caplog):
+    progress_queue = queue.Queue()
+    update_interval = 1  # Set a short update interval for testing
+    progress_monitor = ProgressMonitor(progress_queue, update_interval)
+
+    # Start the progress monitor
+    progress_monitor.start()
+
+    # Send successful updates to the progress monitor
+    for _ in range(5):
+        progress_queue.put({'status': 'success', 'message': 'Task completed'})
+        time.sleep(update_interval)
+
+    # Stop the progress monitor
+    progress_queue.put(None)
+    progress_monitor.join()
+
+    # Check log messages
+    assert 'Task completed' in caplog.text
+    assert 'ProgressMonitor completed.' in caplog.text
+
+def test_progress_monitor_exception_handling(caplog):
+    progress_queue = queue.Queue()
+    update_interval = 1  # Set a short update interval for testing
+    progress_monitor = ProgressMonitor(progress_queue, update_interval)
+
+    # Start the progress monitor
+    progress_monitor.start()
+
+    # Send an exception update to the progress monitor
+    progress_queue.put({'status': 'error', 'message': 'An error occurred'})
+
+    # Stop the progress monitor
+    progress_queue.put(None)
+    progress_monitor.join()
+
+    # Check log messages
+    assert 'An error occurred' in caplog.text
+    assert 'ProgressMonitor completed.' in caplog.text
+
+def test_progress_monitor_no_updates(caplog):
+    message_queue = queue.Queue()
+    update_interval = 1  # Set a short update interval for testing
+    stop_event = threading.Event()
+    num_messages = 5
+    num_senders = 2
+
+    producer = MessageProducer(num_messages, message_queue, stop_event, num_senders)
+    sender = MessageSender(message_queue, stop_event)
+    progress_monitor = ProgressMonitor(None, message_queue, update_interval, stop_event)
+
+    # Start the progress monitor
+    progress_monitor.start()
+
+    # Stop the progress monitor without sending any updates
+    progress_queue.put(None)
+    progress_monitor.join()
+
+    # Check log messages
+    assert 'ProgressMonitor completed.' in caplog.text
+

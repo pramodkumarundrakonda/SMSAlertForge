@@ -8,10 +8,10 @@ install_requirements:
 	pip install -r requirements.txt
 
 run:
-	python3 src/__main__.py --config conf/config.yaml
+	PYTHONPATH=$$PYTHONPATH:$$(pwd) python3 sms_alert_forge/__main__.py --config conf/config.yaml
 
 test:
-	pytest tests/test_*.py
+	PYTHONPATH=$$PYTHONPATH:$$(pwd) pytest tests/test_*.py
 
 clean:
 	rm -rf logs __pycache__

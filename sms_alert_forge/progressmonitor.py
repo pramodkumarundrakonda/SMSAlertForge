@@ -1,3 +1,4 @@
+import curses
 import logging
 import threading
 import time
@@ -37,12 +38,19 @@ class ProgressMonitor(threading.Thread):
                     sender.total_processing_time for sender in self.senders) / total_sent if total_sent > 0 else 0
 
                 all_senders_completed = not any(sender.is_alive() for sender in self.senders)
+
+                # Calculate the center position
+                screen_height, screen_width = self.stdscr.getmaxyx()
+                start_y = max(0, (screen_height - 4) // 2)
+                start_x = max(0, (screen_width - 40) // 2)
+
                 if self.stdscr:
                     self.stdscr.clear()
-                    self.stdscr.addstr(0, 0, f"Elapsed Time: {elapsed_time:.2f}s")
-                    self.stdscr.addstr(1, 0, f"Messages Sent: {total_sent}")
-                    self.stdscr.addstr(2, 0, f"Messages Failed: {total_failed}")
-                    self.stdscr.addstr(3, 0, f"Average Time per Message: {average_time_per_message:.2f}s")
+                    self.stdscr.addstr(start_y, start_x, f"Elapsed Time: {elapsed_time:.2f}s", curses.A_BOLD)
+                    self.stdscr.addstr(start_y + 1, start_x, f"Messages Sent: {total_sent}", curses.A_BOLD)
+                    self.stdscr.addstr(start_y + 2, start_x, f"Messages Failed: {total_failed}", curses.A_BOLD)
+                    self.stdscr.addstr(start_y + 3, start_x,
+                                       f"Average Time per Message: {average_time_per_message:.2f}s", curses.A_BOLD)
                     self.stdscr.refresh()
                 else:
                     logging.info(f"Elapsed Time: {elapsed_time:.2f}s")

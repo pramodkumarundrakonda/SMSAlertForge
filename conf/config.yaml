@@ -2,7 +2,7 @@
 
 # Configuration for message generation
 messages:
-  num_messages: 100  # Number of messages to generate
+  num_messages: 1000  # Number of messages to generate
 
 # Configuration for message senders
 senders:
@@ -17,5 +17,5 @@ progress_monitor:
 # Logging configuration
 logging:
   level: INFO  # Logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)
-  to_console: true  # Set to false if you don't want logs on the console
+  to_console: false  # Set to false if you don't want logs on the console
   to_file: true  # Set to false if you don't want logs in a file
