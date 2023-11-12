@@ -39,12 +39,13 @@ class ProgressMonitor(threading.Thread):
 
                 all_senders_completed = not any(sender.is_alive() for sender in self.senders)
 
-                # Calculate the center position
-                screen_height, screen_width = self.stdscr.getmaxyx()
-                start_y = max(0, (screen_height - 4) // 2)
-                start_x = max(0, (screen_width - 40) // 2)
+
 
                 if self.stdscr:
+                    # Calculate the center position
+                    screen_height, screen_width = self.stdscr.getmaxyx()
+                    start_y = max(0, (screen_height - 4) // 2)
+                    start_x = max(0, (screen_width - 40) // 2)
                     self.stdscr.clear()
                     self.stdscr.addstr(start_y, start_x, f"Elapsed Time: {elapsed_time:.2f}s", curses.A_BOLD)
                     self.stdscr.addstr(start_y + 1, start_x, f"Messages Sent: {total_sent}", curses.A_BOLD)

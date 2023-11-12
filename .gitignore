@@ -1,5 +1,9 @@
+# Exclude directories
 .idea/
-.DS_Store
+__pycache__/
 .pytest_cache/
-.log
-.logs/
+logs/
+
+# Exclude files
+.DS_Store
+*.log
