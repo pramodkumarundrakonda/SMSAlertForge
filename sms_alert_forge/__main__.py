@@ -54,8 +54,6 @@ def read_config(config_file):
         # Check for empty fields in the configuration
         if not all(config.get(section) for section in ['logging', 'messages', 'senders', 'progress_monitor']):
             logging.error("One or more required fields are empty in the configuration. Exiting.")
-            #sys.exit(1)
-
         return config
     except FileNotFoundError:
         logging.error(f"Config file '{config_file}' not found. Exiting.")
@@ -179,11 +177,13 @@ def main(stdscr, config):
         }
         senders = [MessageSender(**sender_config) for _ in range(config['senders']['num_senders'])]
 
+        sms_report = {}
         progress_monitor_config = {
             'stdscr': stdscr,
             'senders': senders,
             'update_interval': config['progress_monitor']['update_interval'],
             'stop_event': stop_event,
+            'sms_report': sms_report,
         }
         progress_monitor = ProgressMonitor(**progress_monitor_config)
 
@@ -211,11 +211,13 @@ def main(stdscr, config):
                 key = stdscr.getch()
                 if key == ord('q'):
                     break
-
+        logging.info(f'sms_report: {sms_report}')
         logging.info("Main completed.")
+        return sms_report
 
     except Exception as e:
         logging.error(f"Error in main: {e}", exc_info=True)
+        raise e
 
 
 if __name__ == "__main__":

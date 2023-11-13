@@ -1,7 +1,23 @@
 import threading
 import queue
 import time
+import warnings
+
+import pytest
+
 from sms_alert_forge.sender import MessageSender
+
+
+@pytest.fixture(autouse=True)
+def suppress_warnings(request):
+    # Suppress PytestUnhandledThreadExceptionWarning
+    warnings.filterwarnings("ignore", category=pytest.PytestUnhandledThreadExceptionWarning)
+
+    # Yield control back to the test function
+    yield
+
+    # Reset warnings filters after the test
+    warnings.resetwarnings()
 
 
 def test_sender_success():

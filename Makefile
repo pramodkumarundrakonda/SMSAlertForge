@@ -11,7 +11,7 @@ run:
 	PYTHONPATH=$$PYTHONPATH:$$(pwd) python3 sms_alert_forge/__main__.py --config conf/config.yaml
 
 test:
-	PYTHONPATH=$$PYTHONPATH:$$(pwd) pytest tests/test_*.py
+	PYTHONPATH=$$PYTHONPATH:$$(pwd) pytest -v tests/test_*.py
 
 clean:
 	rm -rf logs __pycache__

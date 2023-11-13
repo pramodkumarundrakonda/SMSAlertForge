@@ -15,12 +15,13 @@ class ProgressMonitor(threading.Thread):
     - should_terminate: Event to signal termination of the thread.
     """
 
-    def __init__(self, stdscr, senders, update_interval, stop_event):
+    def __init__(self, stdscr, senders, update_interval, stop_event, sms_report):
         super(ProgressMonitor, self).__init__()
         self.stdscr = stdscr
         self.senders = senders
         self.update_interval = update_interval
         self.should_terminate = stop_event
+        self.sms_report = sms_report
 
     def run(self):
         try:
@@ -58,6 +59,12 @@ class ProgressMonitor(threading.Thread):
                     logging.info(f"Messages Sent: {total_sent}")
                     logging.info(f"Messages Failed: {total_failed}")
                     logging.info(f"Average Time per Message: {average_time_per_message:.2f}s")
+
+                # Update the SMS report
+                self.sms_report['elapsed_time'] = elapsed_time
+                self.sms_report['messages_sent'] = total_sent
+                self.sms_report['messages_failed'] = total_failed
+                self.sms_report['average_time_per_message'] = average_time_per_message
 
                 logging.debug(
                     f"Progress update. Elapsed Time: {elapsed_time:.2f}s | Messages Sent: {total_sent} | Messages Failed: {total_failed} | Average Time per Message: {average_time_per_message:.2f}s")
