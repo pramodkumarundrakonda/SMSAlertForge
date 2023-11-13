@@ -4,7 +4,7 @@
             to_console: false
             to_file: true
         messages:
-            num_messages: 1000
+            num_messages: 0
         senders:
             num_senders: 3
             failure_rate: 0.2

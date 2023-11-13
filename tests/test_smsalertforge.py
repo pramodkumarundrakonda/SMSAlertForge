@@ -49,7 +49,6 @@ def clean_logs_directory():
             print(e)
 
 
-
 def run_main():
     setup_logging(read_config(config_file_path))
     sms_report = main(None, read_config(config_file_path))

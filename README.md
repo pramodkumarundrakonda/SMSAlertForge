@@ -18,13 +18,20 @@
 
 1. **Configuration**: Edit the `config.yaml` file to configure the simulation according to your needs. Adjust parameters such as logging levels, the number of messages, sender behavior, and update intervals.
 
-2. **Running the Simulation**: Execute the simulation using the following command:
+2. **Install requirements**: Before executing the simulation, ensure that all necessary requirements are installed by using the following command:
+This command installs the required dependencies, and after the installation is complete, the simulation will start automatically. If you want to run the simulation separately, you can use:
+   ```bash
+   make
+   ```
+   
+
+3. **Running the Simulation**: Execute the simulation using the following command:
 
    ```bash
    make run
    ```
 
-3. **Testing**: Ensure the reliability of the simulation by running tests:
+4. **Testing**: Ensure the reliability of the simulation by running tests:
 
    ```bash
    make test
